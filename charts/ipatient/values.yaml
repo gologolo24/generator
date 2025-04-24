@@ -1,0 +1,46 @@
+ipatient:
+  replicaCount: 1
+  metadata:
+    name: main
+
+  image:
+    pullPolicy: IfNotPresent
+
+  backend:
+    image: golo97/backend:0.1.1
+    port: 8000
+    env:
+      REDIS_HOST: redis-service
+      REDIS_PORT: 6379
+
+  frontend:
+    image: golo97/frontend:1.3.0
+    port: 80
+    env: 
+      REACT_APP_API_URL: /api/v1/orders
+
+  redis:
+    image: redis:alpine
+    port: 6379
+    volumes:
+        name: redis-data
+        path: /data
+    env: dev
+
+
+
+  admin:
+    image: my-admin-image
+    port: 3001
+
+  service:
+    type: ClusterIP
+
+  networkPolicy:
+    enabled: false
+
+  ingress: 
+    front: prod.kubegroundapp.click
+
+  ingress-nginx:
+    enabled: true

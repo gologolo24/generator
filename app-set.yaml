@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: env-applicationset
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/gologolo24/generator.git
+        branches:
+          - main
+          - develop
+          - feature/*
+
+  template:
+    metadata:
+      name: '{{branch}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/gologolo24/generator.git
+        targetRevision: '{{branch}}'
+        path: env
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{branch}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
